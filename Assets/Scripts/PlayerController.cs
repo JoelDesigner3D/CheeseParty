@@ -5,12 +5,18 @@ using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
 
     public float speed = 0;
     public TextMeshProUGUI countText;
+    public GameObject winTextObject;
+    public MenuController menuController;
+    public AudioSource crunch;
+    public AudioSource soundTrap;
+
 
     private Rigidbody rigidBody;
     private int count;
@@ -21,6 +27,9 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        Debug.Log("Starting");
+
         rigidBody = GetComponent<Rigidbody>();
         count = 0;
 
@@ -40,8 +49,6 @@ public class PlayerController : MonoBehaviour
 
         rigidBody.AddForce(movement * speed);
 
-        //EnforceMaxSpeed();
-
     }
 
     void OnMove(InputValue movementValue)
@@ -53,15 +60,52 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        //Debug.Log("OnTrigger");
+
+        if (other.gameObject.CompareTag("Cheese"))
+        {
+            Debug.Log("OnTrigger Cheese");
+            other.gameObject.SetActive(false);
+            count += 1;
+   
+            crunch.Play();
+            
+           
+        } else if (other.gameObject.CompareTag("Hamburger"))
+        {
+            Debug.Log("OnTrigger Hamburger");
+            other.gameObject.SetActive(false);
+            count += 5;
+            crunch.Play();
+
+        } else if (other.gameObject.CompareTag("Finish"))
+        {
+            Debug.Log("OnTrigger Finish");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+
+        SetCountText();
+
+    }
+    
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Trap"))
         {
-            //Respown();
+            count -= 1;
+            SetCountText();
+            soundTrap.Play();
+
+        } else if(collision.gameObject.CompareTag("Enemy")){
+
             EndGame();
+
         }
 
     }
+    
 
     void SetCountText()
     {
@@ -76,7 +120,8 @@ public class PlayerController : MonoBehaviour
 
     void EndGame()
     {
-       // menuController.LoseGame();
+       
+        menuController.LoseGame();
        // gameObject.SetActive(false);
 
     }

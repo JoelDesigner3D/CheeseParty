@@ -3,7 +3,13 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Cheese
+  - Hamburger
+  - Trap
+  - SoundTrap
+  - Spider
+  - Enemy
   layers:
   - Default
   - TransparentFX
