@@ -97,7 +97,7 @@ public class PlayerController : MonoBehaviour
         } else if (other.gameObject.CompareTag("Finish"))
         {
             Debug.Log("OnTrigger Finish");
-            count += 3;
+            //count += 3;
             soundFlower.Play();
             // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
