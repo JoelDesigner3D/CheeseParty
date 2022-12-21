@@ -26,7 +26,12 @@ public class SpiderController : MonoBehaviour
 
     void Move()
     {
+
+       // transform.rotation *= Quaternion.AngleAxis(180, transform.up);
         transform.LookAt(waypoints[waypointsIndex]);
+        //transform.rotation *= Quaternion.Euler(0, 180, 0);
+
+
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
         if (Vector3.Distance(transform.position, waypoints[waypointsIndex].position) < range)
         {

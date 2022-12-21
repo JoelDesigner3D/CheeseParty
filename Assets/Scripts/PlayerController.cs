@@ -16,7 +16,15 @@ public class PlayerController : MonoBehaviour
     public MenuController menuController;
     public AudioSource crunch;
     public AudioSource soundTrap;
+    public AudioSource soundFlower;
+    public AudioSource soundRespown;
+    public Transform respownPoint;
 
+    public float turnSpeed = 120.0f;
+    private float jumpSpeed = 20.0f;
+    private float horizontalInput;
+    private float forwardInput;
+    private float jumpInput;
 
     private Rigidbody rigidBody;
     private int count;
@@ -32,7 +40,6 @@ public class PlayerController : MonoBehaviour
 
         rigidBody = GetComponent<Rigidbody>();
         count = 0;
-
         SetCountText();
 
     }
@@ -40,16 +47,24 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    void FixedUpdate()
+    private void FixedUpdate()
     {
-        Vector3 movement = new Vector3(movementX, 0.0f, movementY);
+        // Keys management
+        horizontalInput = Input.GetAxis("Horizontal");
+        forwardInput = Input.GetAxis("Vertical");
+        jumpInput = Input.GetAxis("Jump");
 
-        rigidBody.AddForce(movement * speed);
-
+        // Translate the vehicle 
+        transform.Translate(Vector3.forward * Time.deltaTime * speed * forwardInput);
+        // Rotate the vehicle
+        transform.Rotate(Vector3.up, turnSpeed * Time.deltaTime * horizontalInput);
+        // Jump the vehicle
+        transform.Translate(Vector3.up * Time.deltaTime * jumpInput * jumpSpeed);
     }
+
 
     void OnMove(InputValue movementValue)
     {
@@ -71,19 +86,20 @@ public class PlayerController : MonoBehaviour
             count += 1;
    
             crunch.Play();
-            
-           
+                       
         } else if (other.gameObject.CompareTag("Hamburger"))
         {
             Debug.Log("OnTrigger Hamburger");
             other.gameObject.SetActive(false);
-            count += 5;
+            count += 2;
             crunch.Play();
 
         } else if (other.gameObject.CompareTag("Finish"))
         {
             Debug.Log("OnTrigger Finish");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            count += 3;
+            soundFlower.Play();
+            // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
 
         SetCountText();
@@ -94,13 +110,12 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Trap"))
         {
-            count -= 1;
             SetCountText();
             soundTrap.Play();
 
         } else if(collision.gameObject.CompareTag("Enemy")){
 
-            EndGame();
+            rebootLevel();
 
         }
 
@@ -111,18 +126,21 @@ public class PlayerController : MonoBehaviour
     {
         countText.text = "Count: " + count.ToString();
 
-        if (count >= 12)
+        if (count >= 15)
         {
-            // winTextObject.SetActive(true);
-            //menuController.WinGame();
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+
         }
     }
 
-    void EndGame()
+    void rebootLevel()
     {
-       
-        menuController.LoseGame();
-       // gameObject.SetActive(false);
+        soundRespown.Play();
+        rigidBody.velocity = Vector3.zero;
+        rigidBody.angularVelocity = Vector3.zero;
+        rigidBody.Sleep();
+        transform.position = respownPoint.position;
 
     }
 }
